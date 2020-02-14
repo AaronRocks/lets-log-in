@@ -7,7 +7,7 @@ const jsonHandler = require('./jsonResponse.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
+  if (parsedUrl.pathname === '/addCar') {
     const body = [];
 
     request.on('error', (err) => {
@@ -32,13 +32,13 @@ const handlePost = (request, response, parsedUrl) => {
 };
 
 const handleGet = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/style.css') {
+  if (parsedUrl.pathname === '/client/style.css') {
     htmlHandler.getCSS(request, response);
   } else if (parsedUrl.pathname === '/') {
     htmlHandler.getIndex(request, response);
-  } else if (parsedUrl.pathname === '/main.js') {
+  } else if (parsedUrl.pathname === '/client/main.js') {
     htmlHandler.getJS(request, response);
-  } else if (parsedUrl.pathname === '/getUsers') {
+  } else if (parsedUrl.pathname === '/getCars') {
     jsonHandler.getCars(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.noCar(request, response, request.method);
