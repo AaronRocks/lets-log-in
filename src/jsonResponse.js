@@ -23,10 +23,10 @@ const getCars = (request, response) => {
 
 const addCar = (request, response, body) => {
   const responseJSON = {
-    message: 'name and age are both required',
+    message: 'name, speed special, and power are required',
   };
 
-  if (!body.name || !body.age) {
+  if (!body.name || !body.power || !body.speed ||!body.special) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
@@ -40,7 +40,9 @@ const addCar = (request, response, body) => {
   }
 
   cars[body.name].name = body.name;
-  cars[body.name].age = body.age;
+  cars[body.name].power = body.power;
+  cars[body.name].speed = body.speed;
+  cars[body.name].special = body.special;
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';

@@ -36,9 +36,9 @@ const handleGet = (request, response, parsedUrl) => {
     htmlHandler.getCSS(request, response);
   } else if (parsedUrl.pathname === '/') {
     htmlHandler.getIndex(request, response);
-  } else if (parsedUrl.pathname === '/client/main.js') {
-    htmlHandler.getJS(request, response);
-  } else if (parsedUrl.pathname === '/getCars') {
+  } else if (parsedUrl.pathname === '/client/src/main.js') {
+    htmlHandler.getCanvasJS(request, response);
+  }else if (parsedUrl.pathname === '/getCars') {
     jsonHandler.getCars(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.noCar(request, response, request.method);
