@@ -37,8 +37,12 @@ const handleGet = (request, response, parsedUrl) => {
   } else if (parsedUrl.pathname === '/') {
     htmlHandler.getIndex(request, response);
   } else if (parsedUrl.pathname === '/client/src/main.js') {
+    htmlHandler.getMainJS(request, response);
+  } else if (parsedUrl.pathname === '/client/src/draw.js') {
     htmlHandler.getCanvasJS(request, response);
-  }else if (parsedUrl.pathname === '/getCars') {
+  } else if (parsedUrl.pathname === '/client/src/handleResponse.js') {
+    htmlHandler.getServerJS(request, response);
+  } else if (parsedUrl.pathname === '/getCars') {
     jsonHandler.getCars(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.noCar(request, response, request.method);

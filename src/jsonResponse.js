@@ -1,5 +1,56 @@
 const cars = {
-
+  raceCars: {
+    'TheMobBoss': {
+      name: 'TheMobBoss',
+      speed: 3,
+      special: 5,
+      power: 7,
+      color: 'red',
+    },
+    'Andire': {
+      name: 'Andire',
+      speed: 1,
+      special: 10,
+      power: 10,
+      color: 'orange',
+    },
+    'TheRipper': {
+      name: 'TheRipper',
+      speed: 8,
+      special: 10,
+      power: 4,
+      color: 'yellow',
+    },
+    'TheCrusher': {
+      name: 'TheCrusher',
+      speed: 3,
+      special: 5,
+      power: 7,
+      color: 'green',
+    },
+    'TheMasher': {
+      name: 'TheMasher',
+      speed: 3,
+      special: 5,
+      power: 7,
+      color: 'blue'
+    },
+    'Scottland': {
+      name: 'Scottland',
+      speed: 3,
+      special: 5,
+      power: 7,
+      color: 'purple',
+    },
+    'Russia': {
+      name: 'Russia',
+      speed: 10,
+      special: 0,
+      power: 10,
+      color: 'white',
+    },
+  },
+  id: 'cars'
 };
 
 const respondJSON = (request, response, status, object) => {
@@ -26,26 +77,29 @@ const addCar = (request, response, body) => {
     message: 'name, speed special, and power are required',
   };
 
-  if (!body.name || !body.power || !body.speed ||!body.special) {
+  if (!body.name || !body.power || !body.speed || !body.special) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
   let responseCode = 201;
+  let name = body.name;
 
-  if (cars[body.name]) {
+  if (cars.raceCars[name]) {
     responseCode = 204;
+    responseJSON.id = 'updated';
   } else {
-    cars[body.name] = {};
+    cars.raceCars[name] = {};
+    cars.raceCars[name].name = name;
   }
 
-  cars[body.name].name = body.name;
-  cars[body.name].power = body.power;
-  cars[body.name].speed = body.speed;
-  cars[body.name].special = body.special;
+  cars.raceCars[name].power = body.power;
+  cars.raceCars[name].speed = body.speed;
+  cars.raceCars[name].special = body.special;
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
+    responseJSON.id = 'created';
     return respondJSON(request, response, responseCode, responseJSON);
   }
 

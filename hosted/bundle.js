@@ -1,126 +1,9 @@
 'use strict';
 
-var parseJSON = function parseJSON(xhr, content) {
-    if (xhr.response) {
-        var obj = JSON.parse(xhr.response);
-        console.dir(obj);
-
-        if (obj.message) {
-            var myString = JSON.stringify(obj.message);
-            content.innerHTML += '<p> ' + myString + '</p>';
-        }
-    }
-};
-
-var handleResponse = function handleResponse(xhr) {
-    var content = document.querySelector('#content');
-
-    switch (xhr.status) {
-        case 200:
-            content.innerHTML = '<b> Success! Retrieved Car </b>';
-            break;
-        case 201:
-            content.innerHTML = '<b> Created Car</b>';
-            break;
-        case 204:
-            content.innerHTML = '<b> Updated Existing Car </b>';
-            break;
-        case 400:
-            content.innerHTML = '<b> Bad Request, Need more info on car </b>';
-            break;
-        case 404:
-            content.innerHTML = '<b> Car Not Found </b>';
-            break;
-        default:
-            // 500
-            content.innerHTML = '<b> Not Implemented Yet </b>';
-            break;
-    }
-
-    parseJSON(xhr, content);
-};
-
-var sendPost = function sendPost(e, nameForm) {
-    e.preventDefault();
-
-    var nameAction = nameForm.getAttribute('action');
-    var nameMethod = nameForm.getAttribute('method');
-
-    var nameField = nameForm.querySelector('#nameField').value;
-    var ageField = nameForm.querySelector('#ageField').value;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(nameMethod, nameAction);
-
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-    xhr.onload = function () {
-        return handleResponse(xhr);
-    };
-
-    var formData = 'name=' + nameField + '&age=' + ageField;
-
-    xhr.send(formData);
-
-    return false;
-};
-
-// for handling get
-var sendAjax = function sendAjax(e, userForm) {
-    e.preventDefault();
-
-    var userRequestType = userForm.getAttribute('method');
-    userRequestType = userForm.querySelector("#methodSelect").value.toUpperCase();
-    var userUrl = userForm.getAttribute('action');
-    userUrl = userForm.querySelector("#urlField").value;
-
-    var xhr = new XMLHttpRequest();
-    xhr.open(userRequestType, userUrl);
-
-    xhr.setRequestHeader("Accept", 'application/json');
-
-    xhr.onload = function () {
-        return handleResponse(xhr);
-    };
-
-    xhr.send();
-};
-'use strict';
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var width = 600;
-var height = 400;
-var ctx = void 0;
-var myCar = void 0;
-
-var init = function init() {
-  // server code
-  // nameform sends a post request
-  var nameForm = document.querySelector('#nameForm');
-  // user form sends a get request (either body or head)
-  var userForm = document.querySelector("#userForm");
-
-  var addUser = function addUser(e) {
-    return sendPost(e, nameForm);
-  };
-
-  nameForm.addEventListener('submit', addUser);
-
-  var getUser = function getUser(e) {
-    return sendAjax(e, userForm);
-  };
-
-  userForm.addEventListener('submit', getUser);
-
-  // canvas code
-  ctx = document.querySelector("canvas").getContext('2d');
-  myCar = new car();
-  loop();
-};
 function drawCar() {
   ctx.beginPath();
   ctx.fillStyle = 'green';
@@ -164,5 +47,137 @@ function loop() {
   drawCar();
   myCar.move();
 }
+'use strict';
+
+var listOfCars = [];
+var activeCars = [];
+
+var parseJSON = function parseJSON(xhr, carSelection) {
+  if (xhr.response) {
+    var obj = JSON.parse(xhr.response);
+    console.dir(obj);
+
+    if (obj.message) {
+      var messageValueArray = Object.values(obj.message);
+      var carValueArray = Object.values(messageValueArray[0]);
+
+      if (messageValueArray[1] === 'cars') for (var el = 0; el < carValueArray.length; el++) {
+        if (!carSelection.options[el]) {
+          var createdCar = document.createElement("option");
+          createdCar.label = carValueArray[el].name;
+          createdCar.value = el; // can find reference to obj later in array
+          createdCar.class = 'selectedCar';
+          carSelection.appendChild(createdCar);
+          listOfCars.push(carValueArray[el]);
+        }
+      }
+    }
+  }
+};
+
+var handleResponse = function handleResponse(xhr) {
+  var content = document.querySelector('#content');
+  var carSelection = document.querySelector('#carSelection');
+
+  switch (xhr.status) {
+    case 200:
+      content.innerHTML = '<b> Success! Retrieved Car </b>';
+      break;
+    case 201:
+      content.innerHTML = '<b> Created Car</b>';
+      break;
+    case 204:
+      content.innerHTML = '<b> Updated Existing Car </b>';
+      break;
+    case 400:
+      content.innerHTML = '<b> Bad Request, Need more info on car </b>';
+      break;
+    case 404:
+      content.innerHTML = '<b> Car Not Found </b>';
+      break;
+    default:
+      // 500
+      content.innerHTML = '<b> Not Implemented Yet </b>';
+      break;
+  }
+
+  parseJSON(xhr, carSelection);
+};
+
+var sendPost = function sendPost(e, nameForm) {
+  e.preventDefault();
+
+  var nameAction = nameForm.getAttribute('action');
+  var nameMethod = nameForm.getAttribute('method');
+
+  var nameField = nameForm.querySelector('#nameField').value;
+  var speedField = nameForm.querySelector('#speedField').value;
+  var specialField = nameForm.querySelector('#specialField').value;
+  var powerField = nameForm.querySelector('#powerField').value;
+
+  var xhr = new XMLHttpRequest();
+  xhr.open(nameMethod, nameAction);
+
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+  xhr.onload = function () {
+    return handleResponse(xhr);
+  };
+
+  var formData = 'name=' + nameField + '&special=' + specialField + '&speed=' + speedField + '&power=' + powerField;
+
+  xhr.send(formData);
+
+  return false;
+};
+
+function handleForm() {
+  // nameform sends a post request
+  var nameForm = document.querySelector('#nameForm');
+  // user form sends a get request (either body or head)
+  // const userForm = document.querySelector("#userForm");
+
+  var getCarsButton = document.querySelector("#getCars");
+
+  var addUser = function addUser(e) {
+    return sendPost(e, nameForm);
+  };
+
+  nameForm.addEventListener('submit', addUser);
+
+  getCarsButton.onclick = function (_) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", '/getCars');
+
+    xhr.setRequestHeader("Accept", 'application/json');
+
+    xhr.onload = function () {
+      return handleResponse(xhr);
+    };
+
+    xhr.send();
+  };
+}
+
+var handleInit = function handleInit() {
+  // server code
+  handleForm();
+};
+
+window.onload = handleInit;
+"use strict";
+
+var width = 600;
+var height = 400;
+var ctx = void 0;
+var myCar = void 0;
+
+var init = function init() {
+    // canvas code
+    ctx = document.querySelector("canvas").getContext('2d');
+    myCar = new car();
+    loop();
+};
 
 window.onload = init;
