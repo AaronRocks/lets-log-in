@@ -4,23 +4,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function drawCar() {
-  ctx.beginPath();
-  ctx.fillStyle = 'green';
-  ctx.fillRect(myCar.xPosition, myCar.yPosition, 40, 30);
-  ctx.stroke();
-}
-
 var car = function () {
   function car(color) {
     var speed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 8;
     var power = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 3;
     var special = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 2;
-    var x = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
-    var y = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 40;
+    var ctx = arguments[4];
+    var x = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 5;
+    var y = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 90;
 
     _classCallCheck(this, car);
 
+    this.ctx = ctx;
     this.speed = speed;
     this.power = power;
     this.special = special;
@@ -30,9 +25,53 @@ var car = function () {
   }
 
   _createClass(car, [{
+    key: 'drawMyCar',
+    value: function drawMyCar() {
+      var x = this.xPosition;
+      var y = this.yPosition;
+
+      this.ctx.save();
+      this.ctx.beginPath();
+      this.ctx.fillStyle = this.color;
+      this.ctx.moveTo(x, y); // start
+      this.ctx.lineTo(x - 5, y + 10); // back - top/ middle
+      this.ctx.lineTo(x - 5, y + 25); // back - middle
+      this.ctx.lineTo(x, y + 25); // back - middle/ bottom
+      this.ctx.lineTo(x, y + 30); // back - bottom
+
+      this.ctx.lineTo(x + 5, y + 30); // bottom to back wheel
+      this.ctx.bezierCurveTo(x + 5, y + 22, x + 15, y + 22, x + 15, y + 30); // back wheel
+      this.ctx.lineTo(x + 25, y + 30); // bottom to front wheel
+      this.ctx.bezierCurveTo(x + 25, y + 22, x + 35, y + 22, x + 35, y + 30); // front wheel
+      this.ctx.lineTo(x + 40, y + 30); // bottom to front
+
+      this.ctx.lineTo(x + 40, y + 25); // front - bottom
+      this.ctx.lineTo(x + 45, y + 25); // front - bottom/ middle
+      this.ctx.lineTo(x + 45, y + 15); // front - middle
+      this.ctx.lineTo(x + 35, y); // front - top
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.strokeStyle = 'green';
+      this.ctx.lineWidth = 2;
+      this.ctx.stroke();
+      this.ctx.restore();
+      this.drawWheel(x, y);
+    }
+  }, {
+    key: 'drawWheel',
+    value: function drawWheel(x, y) {
+      this.ctx.save();
+      this.ctx.fillStyle = this.color;
+      this.ctx.arc(x + 10, y + 30, 5, 0, 2 * Math.PI, false); // back wheel
+      this.ctx.moveTo(x + 30, y + 30);
+      this.ctx.arc(x + 30, y + 30, 5, 0, 2 * Math.PI, false); // front wheel
+      this.ctx.fill();
+      this.ctx.restore();
+    }
+  }, {
     key: 'move',
     value: function move() {
-      if (this.xPosition <= width - 40) {
+      if (this.xPosition <= width - 45) {
         this.xPosition++;
       }
     }
@@ -44,8 +83,31 @@ var car = function () {
 function loop() {
   requestAnimationFrame(loop);
   ctx.clearRect(0, 0, width, height);
-  drawCar();
-  myCar.move();
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = currentCars[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var _car = _step.value;
+
+      _car.drawMyCar();
+      _car.move();
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
 }
 'use strict';
 
@@ -135,9 +197,7 @@ var sendPost = function sendPost(e, nameForm) {
 function handleForm() {
   // nameform sends a post request
   var nameForm = document.querySelector('#nameForm');
-  // user form sends a get request (either body or head)
-  // const userForm = document.querySelector("#userForm");
-
+  // user form sends a get request (either body or head)  
   var getCarsButton = document.querySelector("#getCars");
 
   var addUser = function addUser(e) {
@@ -159,25 +219,39 @@ function handleForm() {
     xhr.send();
   };
 }
-
-var handleInit = function handleInit() {
-  // server code
-  handleForm();
-};
-
-window.onload = handleInit;
 "use strict";
 
 var width = 600;
 var height = 400;
 var ctx = void 0;
-var myCar = void 0;
+var car1 = void 0;
+var currentCars = [];
 
 var init = function init() {
-    // canvas code
-    ctx = document.querySelector("canvas").getContext('2d');
-    myCar = new car();
-    loop();
+
+  var addCarButton = document.querySelector("#addToRace");
+  addCarButton.onclick = function (e) {
+    var currentCar = document.querySelector(".selectedCar").nodeValue;
+    activeCars.push(listOfCars.splice(listOfCars[currentCar], 1));
+  };
+  var app = new Vue({
+    el: "#app",
+    data: {
+      carText: 'Get Cars'
+    },
+    methods: {}
+  });
+  // server code
+  handleForm();
+  ctx = document.querySelector("canvas").getContext('2d');
+  document.querySelector("#race").onclick = function () {
+    for (var i = 0; i < activeCars.length; i++) {
+      var newCar = new car(activeCars[i].color, activeCars[i].speed, activeCars[i].power, activeCars[i].special, ctx);
+      currentCars.push(newCar);
+    }
+  };
+  // canvas code
+  loop();
 };
 
 window.onload = init;

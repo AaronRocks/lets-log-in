@@ -5,11 +5,15 @@
   <link rel="stylesheet" type="text/css" href="../client/style.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
-  <script src="../client/src/handleResponse.js" type="text/babel"></script>
-  <script src="../client/src/draw.js" type="text/babel"></script>
-  <script src="../client/src/main.js" type="text/babel"></script>
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+  <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  <script src="/bundle.js" ></script>
 </head>
 <body>
+  <div id="app">
   <section id="top">
     <h3>Race Some Cars</h3>
     <form id="nameForm" action="/addCar" method="post">
@@ -22,7 +26,7 @@
       <label for="power">power: </label>
       <input id="powerField" type="number" name="power" min="0" max="10" step="1"/>      <input type="submit" value="Add User" />
     </form>
-    <button id="getCars"> Get Cars</button>
+    <button id="getCars"> {{carText}}</button>
   </section>
   <select id="carSelection">
     <option class="selectedCar" value=null>Choose One</option>
@@ -30,7 +34,8 @@
 
   <section id="content"></section>
   <button id="addToRace">Add Car To Race</button>
-
+  <button id="race">Race!</button>
+</div>
   <canvas width='600' height='400'></canvas>
 </body>
 </html>

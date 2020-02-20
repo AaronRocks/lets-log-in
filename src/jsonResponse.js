@@ -1,48 +1,48 @@
 const cars = {
   raceCars: {
-    'TheMobBoss': {
+    TheMobBoss: {
       name: 'TheMobBoss',
       speed: 3,
       special: 5,
       power: 7,
       color: 'red',
     },
-    'Andire': {
+    Andire: {
       name: 'Andire',
       speed: 1,
       special: 10,
       power: 10,
       color: 'orange',
     },
-    'TheRipper': {
+    TheRipper: {
       name: 'TheRipper',
       speed: 8,
       special: 10,
       power: 4,
       color: 'yellow',
     },
-    'TheCrusher': {
+    TheCrusher: {
       name: 'TheCrusher',
       speed: 3,
       special: 5,
       power: 7,
       color: 'green',
     },
-    'TheMasher': {
+    TheMasher: {
       name: 'TheMasher',
       speed: 3,
       special: 5,
       power: 7,
-      color: 'blue'
+      color: 'blue',
     },
-    'Scottland': {
+    Scottland: {
       name: 'Scottland',
       speed: 3,
       special: 5,
       power: 7,
       color: 'purple',
     },
-    'Russia': {
+    Russia: {
       name: 'Russia',
       speed: 10,
       special: 0,
@@ -50,7 +50,7 @@ const cars = {
       color: 'white',
     },
   },
-  id: 'cars'
+  id: 'cars',
 };
 
 const respondJSON = (request, response, status, object) => {
@@ -83,7 +83,7 @@ const addCar = (request, response, body) => {
   }
 
   let responseCode = 201;
-  let name = body.name;
+  const { name } = body;
 
   if (cars.raceCars[name]) {
     responseCode = 204;

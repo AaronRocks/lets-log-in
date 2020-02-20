@@ -36,11 +36,13 @@ const handleGet = (request, response, parsedUrl) => {
     htmlHandler.getCSS(request, response);
   } else if (parsedUrl.pathname === '/') {
     htmlHandler.getIndex(request, response);
-  } else if (parsedUrl.pathname === '/client/src/main.js') {
+  } else if (parsedUrl.pathname === '/main.js') {
     htmlHandler.getMainJS(request, response);
-  } else if (parsedUrl.pathname === '/client/src/draw.js') {
+  } else if (parsedUrl.pathname === '/draw.js') {
     htmlHandler.getCanvasJS(request, response);
-  } else if (parsedUrl.pathname === '/client/src/handleResponse.js') {
+  } else if (parsedUrl.pathname === '/bundle.js') {
+    htmlHandler.getBundleJS(request, response);
+  } else if (parsedUrl.pathname === '/handleResponse.js') {
     htmlHandler.getServerJS(request, response);
   } else if (parsedUrl.pathname === '/getCars') {
     jsonHandler.getCars(request, response);

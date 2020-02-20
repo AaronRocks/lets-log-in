@@ -1,6 +1,7 @@
 const fs = require('fs'); // pull in the file system module
 
 const index = fs.readFileSync(`${__dirname}/../hosted/client.html`);
+const bundle = fs.readFileSync(`${__dirname}/../hosted/bundle.js`);
 const css = fs.readFileSync(`${__dirname}/../client/style.css`);
 const mainJs = fs.readFileSync(`${__dirname}/../client/src/main.js`);
 const canvasJs = fs.readFileSync(`${__dirname}/../client/src/draw.js`);
@@ -33,11 +34,16 @@ const getServerJS = (request, response) => {
   response.write(serverJS);
   response.end();
 };
-
+const getBundleJS = (request, response) => {
+  response.writeHead(200, { 'Content-Type': 'text/javascript' });
+  response.write(bundle);
+  response.end();
+};
 module.exports = {
   getIndex,
   getCSS,
   getCanvasJS,
   getMainJS,
   getServerJS,
+  getBundleJS,
 };

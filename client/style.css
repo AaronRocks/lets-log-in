@@ -13,9 +13,6 @@ html, body {
 #top h1 {
   font-size: 2em;
 }
-#carSelection .selectedCar{
-  text-align: center;
-}
 #content {
   font-size: 2em;
   text-align: center;

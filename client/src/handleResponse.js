@@ -83,9 +83,7 @@ const parseJSON = (xhr, carSelection) => {
   function handleForm(){
     // nameform sends a post request
     const nameForm = document.querySelector('#nameForm');
-    // user form sends a get request (either body or head)
-    // const userForm = document.querySelector("#userForm");
-  
+    // user form sends a get request (either body or head)  
     const getCarsButton = document.querySelector("#getCars");
   
         
@@ -104,10 +102,3 @@ const parseJSON = (xhr, carSelection) => {
       xhr.send();
     }
 }
-
-const handleInit = () =>{
-   // server code
-   handleForm();
-}
-
-window.onload = handleInit;
