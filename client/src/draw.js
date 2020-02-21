@@ -1,5 +1,5 @@
 class car{
-    constructor(color = "purple", speed, power, special, ctx, x = 5, y = 90){
+    constructor(color = "purple", speed, power, special, ctx, x = 5, y = 90, name = 'elizabeth'){
       this.ctx = ctx;
       this.speed = speed;
       this.power = power;
@@ -7,6 +7,7 @@ class car{
       this.xPosition = x;
       this.yPosition = y;
       this.color = color;
+      this.name = name;
     }
 
     drawMyCar(){
@@ -53,7 +54,7 @@ class car{
   
     move(){
       if (this.xPosition <= width - 45){
-        this.xPosition++;
+        this.xPosition += (this.special + this.speed + this.power)/ 10;
       }
     }
   }

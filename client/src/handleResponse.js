@@ -11,7 +11,8 @@ const parseJSON = (xhr, carSelection) => {
   
         if (messageValueArray[1] === 'cars')
           for (let el = 0; el < carValueArray.length; el++){
-            if (!carSelection.options[el]){
+            console.log(carSelection.options);
+            if (!carSelection.options[el] || carSelection.selectedIndex === -1){
               let createdCar = document.createElement("option");
               createdCar.label = carValueArray[el].name;
               createdCar.value = el; // can find reference to obj later in array
@@ -23,6 +24,7 @@ const parseJSON = (xhr, carSelection) => {
               listOfCars[el] = carValueArray[el];
             }
           }
+          console.log("____");
       }
     }
   };
@@ -81,13 +83,3 @@ const parseJSON = (xhr, carSelection) => {
     
     return false;
   };
-  
-  function handleForm(){
-    // nameform sends a post request
-    const nameForm = document.querySelector('#nameForm');
-    // user form sends a get request (either body or head)    
-        
-    const addUser = (e) => sendPost(e, nameForm);
-        
-    nameForm.addEventListener('submit', addUser);
-}

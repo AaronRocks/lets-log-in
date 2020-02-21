@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -13,6 +13,7 @@ var car = function () {
     var ctx = arguments[4];
     var x = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 5;
     var y = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 90;
+    var name = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 'elizabeth';
 
     _classCallCheck(this, car);
 
@@ -23,10 +24,11 @@ var car = function () {
     this.xPosition = x;
     this.yPosition = y;
     this.color = color;
+    this.name = name;
   }
 
   _createClass(car, [{
-    key: "drawMyCar",
+    key: 'drawMyCar',
     value: function drawMyCar() {
       var x = this.xPosition;
       var y = this.yPosition;
@@ -59,7 +61,7 @@ var car = function () {
       this.drawWheel(x, y);
     }
   }, {
-    key: "drawWheel",
+    key: 'drawWheel',
     value: function drawWheel(x, y) {
       this.ctx.save();
       this.ctx.fillStyle = this.color;
@@ -70,10 +72,10 @@ var car = function () {
       this.ctx.restore();
     }
   }, {
-    key: "move",
+    key: 'move',
     value: function move() {
       if (this.xPosition <= width - 45) {
-        this.xPosition++;
+        this.xPosition += (this.special + this.speed + this.power) / 10;
       }
     }
   }]);
@@ -124,7 +126,8 @@ var parseJSON = function parseJSON(xhr, carSelection) {
       var carValueArray = Object.values(messageValueArray[0]);
 
       if (messageValueArray[1] === 'cars') for (var el = 0; el < carValueArray.length; el++) {
-        if (!carSelection.options[el]) {
+        console.log(carSelection.options);
+        if (!carSelection.options[el] || carSelection.selectedIndex === -1) {
           var createdCar = document.createElement("option");
           createdCar.label = carValueArray[el].name;
           createdCar.value = el; // can find reference to obj later in array
@@ -135,6 +138,7 @@ var parseJSON = function parseJSON(xhr, carSelection) {
           listOfCars[el] = carValueArray[el];
         }
       }
+      console.log("____");
     }
   }
 };
@@ -196,18 +200,6 @@ var sendPost = function sendPost(e, nameForm) {
 
   return false;
 };
-
-function handleForm() {
-  // nameform sends a post request
-  var nameForm = document.querySelector('#nameForm');
-  // user form sends a get request (either body or head)    
-
-  var addUser = function addUser(e) {
-    return sendPost(e, nameForm);
-  };
-
-  nameForm.addEventListener('submit', addUser);
-}
 "use strict";
 
 var width = 600;
@@ -215,27 +207,35 @@ var height = 400;
 var ctx = void 0;
 var car1 = void 0;
 var currentCars = [];
+var app = void 0;
 
 var init = function init() {
-  console.log(listOfCars);
 
-  var app = new Vue({
+  app = new Vue({
     el: "#app",
     data: {
       carText: 'Get Cars',
       options: {}
+      //racing: true,
     },
     methods: {
       addMyCar: function addMyCar() {
         var myCar = document.querySelector("#carSelection");
-        var currentCar = myCar.options[myCar.selectedIndex].value - 1;
-        activeCars.push(listOfCars.splice(currentCar, 1));
-        console.log(listOfCars);
-        console.log(activeCars);
+        // check to make sure the value they are entering is not null
+        if (!myCar.options[myCar.selectedIndex]) {
+          // if this code runs, the value is null
+          this.retrieveCars('/badRequest');
+          return;
+        }
+        var currentCar = myCar.options[myCar.selectedIndex].value;
+        var carToAdd = listOfCars.splice(currentCar, 1);
+        activeCars.push(carToAdd);
+        myCar.remove(myCar.selectedIndex);
+        //racing = false;
       },
-      retrieveCars: function retrieveCars() {
+      retrieveCars: function retrieveCars(url) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", '/getCars');
+        xhr.open("GET", url);
 
         xhr.setRequestHeader("Accept", 'application/json');
 
@@ -244,23 +244,36 @@ var init = function init() {
         };
 
         xhr.send();
+
+        currentCars = []; // every time retrieve list, epty currenty race track
+      },
+      addCar: function addCar(e) {
+        var nameForm = document.querySelector('#nameForm');
+        sendPost(e, nameForm);
+      },
+      interemGetCar: function interemGetCar() {
+        var url = '/getCars';
+        this.retrieveCars(url);
+      },
+      race: function race() {
+        for (var i = 0; i < activeCars.length; i++) {
+          console.log(activeCars[i][0]);
+          var newCar = new car(activeCars[i][0].color, activeCars[i][0].speed, activeCars[i][0].power, activeCars[i][0].special, ctx, 5, i * 40 + 30, activeCars[i][0].name);
+          currentCars.push(newCar);
+          console.log(newCar);
+        }
+        //racing = false;
       }
     },
     computed: {
-      isDisabled: function isDisabled() {}
+      isDisabled: function isDisabled() {
+        //return racing;
+      }
     }
   });
-  // server code
-  handleForm();
-  ctx = document.querySelector("canvas").getContext('2d');
-  document.querySelector("#race").onclick = function () {
-    for (var i = 0; i < activeCars.length; i++) {
-      var newCar = new car(activeCars[i][0].color, activeCars[i][0].speed, activeCars[i][0].power, activeCars[i][0].special, ctx, 5, i * 40 + 30);
-      console.log(newCar);
-      currentCars.push(newCar);
-    }
-  };
+
   // canvas code
+  ctx = document.querySelector("canvas").getContext('2d');
   loop();
 };
 

@@ -26,19 +26,20 @@
       <label for="special">special: </label>
       <input id="specialField" type="number" name="special" min="0" max="10" step="1"/>
       <label for="power">power: </label>
-      <input id="powerField" type="number" name="power" min="0" max="10" step="1"/>      <input type="submit" value="Add User" />
+      <input id="powerField" type="number" name="power" min="0" max="10" step="1"/>
+      <input type="submit" value="Add Car" @click='addCar'/>
     </form>
-    <button id="getCars" @click=retrieveCars> {{carText}}</button>
+    <button id="getCars" @click=interemGetCar> {{carText}}</button>
   </section>
   <select id="carSelection">
-    <option class="selectedCar" v-for="option in options" v-bind="option.value">
+    <option class="selectedCar" v-for="option in options">
       {{option.text}}
     </option>
   </select>
 
   <section id="content"></section>
   <button id="addToRace" @click='addMyCar'>Add Car To Race</button>
-  <button id="race">Race!</button>
+  <button id="race" :disabled="isDisabled" @click='race'>Race!</button>
 </div>
   <canvas width='600' height='400'></canvas>
 </body>
