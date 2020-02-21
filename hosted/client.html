@@ -19,6 +19,8 @@
     <form id="nameForm" action="/addCar" method="post">
       <label for="name">Name: </label>
       <input id="nameField" type="text" name="name" />
+      <label for="color">Color: </label>
+      <input id="colorField" type="text" name="color" />
       <label for="speed">speed: </label>
       <input id="speedField" type="number" name="speed" min="0" max="10" step="1"/>
       <label for="special">special: </label>
@@ -26,14 +28,16 @@
       <label for="power">power: </label>
       <input id="powerField" type="number" name="power" min="0" max="10" step="1"/>      <input type="submit" value="Add User" />
     </form>
-    <button id="getCars"> {{carText}}</button>
+    <button id="getCars" @click=retrieveCars> {{carText}}</button>
   </section>
   <select id="carSelection">
-    <option class="selectedCar" value=null>Choose One</option>
+    <option class="selectedCar" v-for="option in options" v-bind="option.value">
+      {{option.text}}
+    </option>
   </select>
 
   <section id="content"></section>
-  <button id="addToRace">Add Car To Race</button>
+  <button id="addToRace" @click='addMyCar'>Add Car To Race</button>
   <button id="race">Race!</button>
 </div>
   <canvas width='600' height='400'></canvas>

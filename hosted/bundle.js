@@ -1,14 +1,15 @@
-'use strict';
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var car = function () {
-  function car(color) {
-    var speed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 8;
-    var power = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 3;
-    var special = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 2;
+  function car() {
+    var color = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "purple";
+    var speed = arguments[1];
+    var power = arguments[2];
+    var special = arguments[3];
     var ctx = arguments[4];
     var x = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 5;
     var y = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 90;
@@ -25,7 +26,7 @@ var car = function () {
   }
 
   _createClass(car, [{
-    key: 'drawMyCar',
+    key: "drawMyCar",
     value: function drawMyCar() {
       var x = this.xPosition;
       var y = this.yPosition;
@@ -58,7 +59,7 @@ var car = function () {
       this.drawWheel(x, y);
     }
   }, {
-    key: 'drawWheel',
+    key: "drawWheel",
     value: function drawWheel(x, y) {
       this.ctx.save();
       this.ctx.fillStyle = this.color;
@@ -69,7 +70,7 @@ var car = function () {
       this.ctx.restore();
     }
   }, {
-    key: 'move',
+    key: "move",
     value: function move() {
       if (this.xPosition <= width - 45) {
         this.xPosition++;
@@ -117,7 +118,6 @@ var activeCars = [];
 var parseJSON = function parseJSON(xhr, carSelection) {
   if (xhr.response) {
     var obj = JSON.parse(xhr.response);
-    console.dir(obj);
 
     if (obj.message) {
       var messageValueArray = Object.values(obj.message);
@@ -131,6 +131,8 @@ var parseJSON = function parseJSON(xhr, carSelection) {
           createdCar.class = 'selectedCar';
           carSelection.appendChild(createdCar);
           listOfCars.push(carValueArray[el]);
+        } else {
+          listOfCars[el] = carValueArray[el];
         }
       }
     }
@@ -173,6 +175,7 @@ var sendPost = function sendPost(e, nameForm) {
   var nameMethod = nameForm.getAttribute('method');
 
   var nameField = nameForm.querySelector('#nameField').value;
+  var colorField = nameForm.querySelector('#colorField').value;
   var speedField = nameForm.querySelector('#speedField').value;
   var specialField = nameForm.querySelector('#specialField').value;
   var powerField = nameForm.querySelector('#powerField').value;
@@ -187,7 +190,7 @@ var sendPost = function sendPost(e, nameForm) {
     return handleResponse(xhr);
   };
 
-  var formData = 'name=' + nameField + '&special=' + specialField + '&speed=' + speedField + '&power=' + powerField;
+  var formData = 'name=' + nameField + '&special=' + specialField + '&speed=' + speedField + '&power=' + powerField + '&color=' + colorField;
 
   xhr.send(formData);
 
@@ -197,27 +200,13 @@ var sendPost = function sendPost(e, nameForm) {
 function handleForm() {
   // nameform sends a post request
   var nameForm = document.querySelector('#nameForm');
-  // user form sends a get request (either body or head)  
-  var getCarsButton = document.querySelector("#getCars");
+  // user form sends a get request (either body or head)    
 
   var addUser = function addUser(e) {
     return sendPost(e, nameForm);
   };
 
   nameForm.addEventListener('submit', addUser);
-
-  getCarsButton.onclick = function (_) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", '/getCars');
-
-    xhr.setRequestHeader("Accept", 'application/json');
-
-    xhr.onload = function () {
-      return handleResponse(xhr);
-    };
-
-    xhr.send();
-  };
 }
 "use strict";
 
@@ -228,25 +217,46 @@ var car1 = void 0;
 var currentCars = [];
 
 var init = function init() {
+  console.log(listOfCars);
 
-  var addCarButton = document.querySelector("#addToRace");
-  addCarButton.onclick = function (e) {
-    var currentCar = document.querySelector(".selectedCar").nodeValue;
-    activeCars.push(listOfCars.splice(listOfCars[currentCar], 1));
-  };
   var app = new Vue({
     el: "#app",
     data: {
-      carText: 'Get Cars'
+      carText: 'Get Cars',
+      options: {}
     },
-    methods: {}
+    methods: {
+      addMyCar: function addMyCar() {
+        var myCar = document.querySelector("#carSelection");
+        var currentCar = myCar.options[myCar.selectedIndex].value - 1;
+        activeCars.push(listOfCars.splice(currentCar, 1));
+        console.log(listOfCars);
+        console.log(activeCars);
+      },
+      retrieveCars: function retrieveCars() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", '/getCars');
+
+        xhr.setRequestHeader("Accept", 'application/json');
+
+        xhr.onload = function () {
+          return handleResponse(xhr);
+        };
+
+        xhr.send();
+      }
+    },
+    computed: {
+      isDisabled: function isDisabled() {}
+    }
   });
   // server code
   handleForm();
   ctx = document.querySelector("canvas").getContext('2d');
   document.querySelector("#race").onclick = function () {
     for (var i = 0; i < activeCars.length; i++) {
-      var newCar = new car(activeCars[i].color, activeCars[i].speed, activeCars[i].power, activeCars[i].special, ctx);
+      var newCar = new car(activeCars[i][0].color, activeCars[i][0].speed, activeCars[i][0].power, activeCars[i][0].special, ctx, 5, i * 40 + 30);
+      console.log(newCar);
       currentCars.push(newCar);
     }
   };

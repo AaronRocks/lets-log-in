@@ -4,7 +4,6 @@ let activeCars = [];
 const parseJSON = (xhr, carSelection) => {
     if (xhr.response){
       const obj = JSON.parse(xhr.response);
-      console.dir(obj);
   
       if (obj.message){
         let messageValueArray = Object.values(obj.message);
@@ -20,7 +19,9 @@ const parseJSON = (xhr, carSelection) => {
               carSelection.appendChild(createdCar);
               listOfCars.push(carValueArray[el]);
             }
-            
+            else{
+              listOfCars[el] = carValueArray[el];
+            }
           }
       }
     }
@@ -61,6 +62,7 @@ const parseJSON = (xhr, carSelection) => {
     const nameMethod = nameForm.getAttribute('method');
   
     const nameField = nameForm.querySelector('#nameField').value;
+    const colorField = nameForm.querySelector('#colorField').value;
     const speedField = nameForm.querySelector('#speedField').value;
     const specialField = nameForm.querySelector('#specialField').value;
     const powerField = nameForm.querySelector('#powerField').value;
@@ -73,7 +75,7 @@ const parseJSON = (xhr, carSelection) => {
   
     xhr.onload = () => handleResponse(xhr);
   
-    const formData = `name=${nameField}&special=${specialField}&speed=${speedField}&power=${powerField}`;
+    const formData = `name=${nameField}&special=${specialField}&speed=${speedField}&power=${powerField}&color=${colorField}`;
   
     xhr.send(formData);
     
@@ -83,22 +85,9 @@ const parseJSON = (xhr, carSelection) => {
   function handleForm(){
     // nameform sends a post request
     const nameForm = document.querySelector('#nameForm');
-    // user form sends a get request (either body or head)  
-    const getCarsButton = document.querySelector("#getCars");
-  
+    // user form sends a get request (either body or head)    
         
     const addUser = (e) => sendPost(e, nameForm);
         
     nameForm.addEventListener('submit', addUser);
-  
-    getCarsButton.onclick =  (_) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", '/getCars');
-  
-      xhr.setRequestHeader("Accept", 'application/json');
-  
-      xhr.onload = () => handleResponse(xhr);
-  
-      xhr.send();
-    }
 }

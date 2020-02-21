@@ -1,5 +1,5 @@
 class car{
-    constructor(color, speed = 8, power = 3, special = 2, ctx, x = 5, y = 90){
+    constructor(color = "purple", speed, power, special, ctx, x = 5, y = 90){
       this.ctx = ctx;
       this.speed = speed;
       this.power = power;
