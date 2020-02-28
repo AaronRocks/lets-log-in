@@ -54,7 +54,7 @@ class car{
   
     move(){
       if (this.xPosition <= width - 45){
-        this.xPosition += (this.special + this.speed + this.power)/ 10;
+        this.xPosition += (this.special * (Math.random() + 1) + this.speed * 2 + this.power)/ 10;
       }
     }
   }
@@ -62,8 +62,25 @@ class car{
   function loop(){
     requestAnimationFrame(loop);
     ctx.clearRect(0, 0, width, height);
-    for (let car of currentCars){
-      car.drawMyCar();
-      car.move();
+    ctx.save();
+    // draw race lines on canvas
+    for (let i = 0; i < height/30; i++){
+      ctx.moveTo(0, 40*i);
+      ctx.lineTo(width, 40*i);
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
     }
+    ctx.restore();
+  // daw all the cars
+  if (currentCars != [] && !winning){
+    for (let carToDraw of currentCars){
+      carToDraw.drawMyCar();
+      carToDraw.move();
+      if (carToDraw.xPosition === (width - 45)){
+        winning = true;
+      }
+    }
+
+  }
+    
 }

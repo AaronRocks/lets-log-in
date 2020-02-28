@@ -75,7 +75,7 @@ var car = function () {
     key: 'move',
     value: function move() {
       if (this.xPosition <= width - 45) {
-        this.xPosition += (this.special + this.speed + this.power) / 10;
+        this.xPosition += (this.special * (Math.random() + 1) + this.speed * 2 + this.power) / 10;
       }
     }
   }]);
@@ -86,28 +86,43 @@ var car = function () {
 function loop() {
   requestAnimationFrame(loop);
   ctx.clearRect(0, 0, width, height);
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+  ctx.save();
+  // draw race lines on canvas
+  for (var i = 0; i < height / 30; i++) {
+    ctx.moveTo(0, 40 * i);
+    ctx.lineTo(width, 40 * i);
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+  }
+  ctx.restore();
+  // daw all the cars
+  if (currentCars != [] && !winning) {
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-  try {
-    for (var _iterator = currentCars[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _car = _step.value;
-
-      _car.drawMyCar();
-      _car.move();
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
     try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
+      for (var _iterator = currentCars[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var carToDraw = _step.value;
+
+        carToDraw.drawMyCar();
+        carToDraw.move();
+        if (carToDraw.xPosition === width - 45) {
+          winning = true;
+        }
       }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
     } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
       }
     }
   }
@@ -125,20 +140,37 @@ var parseJSON = function parseJSON(xhr, carSelection) {
       var messageValueArray = Object.values(obj.message);
       var carValueArray = Object.values(messageValueArray[0]);
 
-      if (messageValueArray[1] === 'cars') for (var el = 0; el < carValueArray.length; el++) {
-        console.log(carSelection.options);
-        if (!carSelection.options[el] || carSelection.selectedIndex === -1) {
-          var createdCar = document.createElement("option");
-          createdCar.label = carValueArray[el].name;
-          createdCar.value = el; // can find reference to obj later in array
-          createdCar.class = 'selectedCar';
-          carSelection.appendChild(createdCar);
-          listOfCars.push(carValueArray[el]);
-        } else {
-          listOfCars[el] = carValueArray[el];
+      if (messageValueArray[1] === 'cars') {
+        var carExist = {
+          current: {}
+        };
+        for (var el = 0; el < carValueArray.length; el++) {
+          carExist.current = carValueArray[el];
+          if (carSelection.options[el] !== undefined) {
+            if (listOfCars[el].name === carSelection.options[el].label) {
+              continue;
+            } else {
+              var createdCar = document.createElement("option");
+              createdCar.label = carExist.current.name;
+              createdCar.value = el; // can find reference to obj later in array
+              createdCar.class = 'selectedCar';
+              carSelection.add(createdCar, carSelection[el]);
+            }
+          } else {
+            // should only run if the nlist of cars is completely empty
+            if (carExist.current.name !== 'undefined') {
+              var _createdCar = document.createElement("option");
+              _createdCar.label = carExist.current.name;
+              _createdCar.value = el; // can find reference to obj later in array
+              _createdCar.class = 'selectedCar';
+              carSelection.appendChild(_createdCar);
+              listOfCars.push(carExist.current);
+            }
+          }
         }
+        activeCars = []; // every time retrieve list, epty currenty race track
+        currentCars = [];
       }
-      console.log("____");
     }
   }
 };
@@ -149,6 +181,7 @@ var handleResponse = function handleResponse(xhr) {
 
   switch (xhr.status) {
     case 200:
+      if (content.innerHTML !== 'Car Not Found') ;
       content.innerHTML = '<b> Success! Retrieved Car </b>';
       break;
     case 201:
@@ -198,6 +231,32 @@ var sendPost = function sendPost(e, nameForm) {
 
   xhr.send(formData);
 
+  var carToSave = {
+    name: nameField,
+    color: colorField,
+    special: specialField,
+    speed: speedField,
+    power: powerField
+  };
+
+  allCars._saveCar(carToSave);
+  return false;
+};
+
+var sendPostNoForm = function sendPostNoForm(nameField, specialField, speedField, powerField, colorField) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/addCar');
+
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+  xhr.onload = function () {
+    return handleResponse(xhr);
+  };
+
+  var formData = 'name=' + nameField + '&special=' + specialField + '&speed=' + speedField + '&power=' + powerField + '&color=' + colorField;
+  xhr.send(formData);
+
   return false;
 };
 "use strict";
@@ -207,31 +266,37 @@ var height = 400;
 var ctx = void 0;
 var car1 = void 0;
 var currentCars = [];
-var app = void 0;
+var winning = false;
 
 var init = function init() {
 
-  app = new Vue({
+  var app = new Vue({
     el: "#app",
     data: {
-      carText: 'Get Cars',
-      options: {}
-      //racing: true,
+      carText: 'Rest Car List',
+      options: {},
+      racing: true,
+      carsInRace: []
     },
     methods: {
       addMyCar: function addMyCar() {
         var myCar = document.querySelector("#carSelection");
         // check to make sure the value they are entering is not null
         if (!myCar.options[myCar.selectedIndex]) {
-          // if this code runs, the value is null
+          // if this code runs, the value is null - user makes bad request as not having any cars left to race
           this.retrieveCars('/badRequest');
+          if (currentCars) {
+            this.racing = false;
+          }
           return;
         }
+        // update list of cars that will be racing from list of all cars
         var currentCar = myCar.options[myCar.selectedIndex].value;
-        var carToAdd = listOfCars.splice(currentCar, 1);
+        var carToAdd = listOfCars[currentCar];
         activeCars.push(carToAdd);
         myCar.remove(myCar.selectedIndex);
-        //racing = false;
+        this.racing = false; // can now click racing button
+        this.carsInRace.push(carToAdd);
       },
       retrieveCars: function retrieveCars(url) {
         var xhr = new XMLHttpRequest();
@@ -245,29 +310,97 @@ var init = function init() {
 
         xhr.send();
 
-        currentCars = []; // every time retrieve list, epty currenty race track
+        this.racing = true;
+        this.carsInRace = [];
       },
+
+      // add car to server (reactive)
       addCar: function addCar(e) {
         var nameForm = document.querySelector('#nameForm');
         sendPost(e, nameForm);
+        this.interemGetCar();
       },
+
+      // since grabing button from form, sends proper url to retreive all cars
       interemGetCar: function interemGetCar() {
         var url = '/getCars';
         this.retrieveCars(url);
       },
       race: function race() {
-        for (var i = 0; i < activeCars.length; i++) {
-          console.log(activeCars[i][0]);
-          var newCar = new car(activeCars[i][0].color, activeCars[i][0].speed, activeCars[i][0].power, activeCars[i][0].special, ctx, 5, i * 40 + 30, activeCars[i][0].name);
-          currentCars.push(newCar);
-          console.log(newCar);
+        // when racing, chacks to make sure there are at least 2 cars (min for race)
+        currentCars = [];
+
+        winning = false;
+
+        if (activeCars.length < 2) {
+          document.querySelector("#content").innerHTML = '<b>Not enough cars in race. Need at least 2 cars</b>';
+          return;
+        } else {
+          document.querySelector("#content").innerHTML = '<b>The race begins!</b>';
         }
-        //racing = false;
+
+        // when time to race, cares list of cars to race, creates car class and starts drawing cars
+        for (var i = 0; i < activeCars.length; i++) {
+          var newCar = new car(activeCars[i].color, activeCars[i].speed, activeCars[i].power, activeCars[i].special, ctx, 5, i * 40, activeCars[i].name);
+          currentCars.push(newCar);
+        }
       }
     },
+    created: function created() {
+      // when vue is first instantiated on the client side, it makes a call 
+      //to the server for all the cars that are there and will also send a call to 
+      // add and cars in local storage to the list by adding them
+      var carsToCreate = allCars._load();
+      if (carsToCreate) {
+        var createdCar = carsToCreate.split('|'); // addto to local storage withj a | marker seperating them
+        var carsFromStorage = [];
+        for (var i = 0; i < createdCar.length; i++) {
+          var interemCar = JSON.parse(createdCar[i]); // parses the split strings back into objects
+          for (var j = 0; j < carsFromStorage.length; j++) {
+            if (interemCar.name === carsFromStorage[j].name) {
+              // checks if the car being parsed is an updated version of a previous car
+              carsFromStorage[j] = interemCar;
+              interemCar.updated = true;
+              continue;
+            }
+          }
+          if (!interemCar.updated) {
+            // if the car is not an update of the previous car, add to list of cars to push/ request from server
+            carsFromStorage.push(interemCar);
+          }
+        }
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = carsFromStorage[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var _car = _step.value;
+
+            sendPostNoForm(_car.name, _car.special, _car.speed, _car.power, _car.color);
+          }
+          //sendPostNoForm(carsToCreate.name, carsToCreate.special, carsToCreate.speed, carsToCreate.power, carsToCreate.color);
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+      }
+      this.interemGetCar();
+    },
+
     computed: {
       isDisabled: function isDisabled() {
-        //return racing;
+        return this.racing;
       }
     }
   });
@@ -278,3 +411,39 @@ var init = function init() {
 };
 
 window.onload = init;
+// clear storage if need to analyze why local storage is throwing an error
+//window.localStorage.clear();
+'use strict';
+
+// variables for local storage
+var prefix = 'axf8278-';
+var numCarsSaved = 1;
+var carKey = prefix + 'car';
+var myCurrentCars = {};
+
+var allCars = {
+    _saveCar: function _saveCar(val) {
+        // gat all cars already there, and add a new car to the list
+        var storedCars = this._load();
+        // val is stringified JSON the user endered into the form
+        var valToStore = JSON.stringify(val);
+        var toStore = storedCars;
+        if (storedCars) {
+            toStore += '|' + valToStore;
+            localStorage.setItem(carKey, toStore);
+        } else {
+            localStorage.setItem(carKey, valToStore);
+        }
+        //localStorage.setItem(carKey, valToStore);
+    },
+    _load: function _load() {
+        var storedCars = localStorage.getItem(carKey); // atempt to retrieve stored cars from sotrage
+        if (storedCars) // if stored cars returns something
+            {
+                myCurrentCars = storedCars; // parse the retruned object of stored cars
+            } else {
+            return null; // no car returned 
+        }
+        return myCurrentCars; // return new carObjects
+    }
+};

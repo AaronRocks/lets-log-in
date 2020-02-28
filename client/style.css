@@ -1,13 +1,14 @@
 html, body {
   height: 100%;
-  width: 100%;
+  width: 98%;
   margin: 0;
   padding: 0;
+  background-color: #ff3333;
 }
 
-#top {
+.selectedCar, #top {
   text-align: center;
-  margin: 0 auto;
+  margin: 0;
 }
 
 #top h1 {

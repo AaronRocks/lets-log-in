@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Our simple HTTP server</title>
-  <link rel="stylesheet" type="text/css" href="../client/style.css">
-  
+  <title>Our simple HTTP server</title>  
+  <!--import babel-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+
+  <!--import vueJS and bootstrap-->
   <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
   <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://unpkg.com/vue@latest/dist/vue.min.js"></script>
   <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+  
+  <!--import client side CSS and JS-->
+  <link rel="stylesheet" type="text/css" href="../client/style.css">
   <script src="/bundle.js" ></script>
 </head>
 <body>
@@ -38,6 +42,7 @@
   </select>
 
   <section id="content"></section>
+  <ol class="row"><li class="col-sm-2" v-for="car in carsInRace">{{car}}</li></ol>
   <button id="addToRace" @click='addMyCar'>Add Car To Race</button>
   <button id="race" :disabled="isDisabled" @click='race'>Race!</button>
 </div>
