@@ -42,7 +42,7 @@
   </select>
 
   <section id="content"></section>
-  <ol class="row"><li class="col-sm-2" v-for="car in carsInRace">{{car}}</li></ol>
+  <ol class="row"><li class="col-sm-2" id="myList" v-for="car in carsInRace">{{car}}</li></ol>
   <button id="addToRace" @click='addMyCar'>Add Car To Race</button>
   <button id="race" :disabled="isDisabled" @click='race'>Race!</button>
 </div>

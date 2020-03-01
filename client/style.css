@@ -18,8 +18,10 @@ html, body {
   font-size: 2em;
   text-align: center;
 }
-
 canvas{
   background-color: black;
   margin-left: 100px;
+}
+.myList{
+  background-color: blanchedalmond;
 }
