@@ -96,6 +96,8 @@ const addCar = (request, response, body) => {
   cars.raceCars[name].power = body.power;
   cars.raceCars[name].speed = body.speed;
   cars.raceCars[name].special = body.special;
+  if (!body.color)
+  body.color = 'purple';
   cars.raceCars[name].color = body.color;
 
   if (responseCode === 201) {

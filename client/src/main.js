@@ -81,6 +81,8 @@ const init = () =>{
         
         // when time to race, cares list of cars to race, creates car class and starts drawing cars
         for (let i = 0; i < activeCars.length; i++){
+          if (activeCars[i].color == "")
+            activeCars[i].color = 'light gray';
           let newCar = new car(activeCars[i].color, activeCars[i].speed, activeCars[i].power, activeCars[i].special, ctx, 5, (i*40), activeCars[i].name);
           currentCars.push(newCar);
         }

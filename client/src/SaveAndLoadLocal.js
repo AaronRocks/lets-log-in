@@ -6,6 +6,10 @@ let myCurrentCars = {};
 
 let allCars = {
     _saveCar(val){
+        // check to make sure have all params before saving
+        if (!val.name || !val.power || !val.speed || !val.special){
+            return;
+        }
         // gat all cars already there, and add a new car to the list
         let storedCars = this._load();
         // val is stringified JSON the user endered into the form

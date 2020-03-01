@@ -349,6 +349,7 @@ var init = function init() {
 
         // when time to race, cares list of cars to race, creates car class and starts drawing cars
         for (var i = 0; i < activeCars.length; i++) {
+          if (activeCars[i].color == "") activeCars[i].color = 'light gray';
           var newCar = new car(activeCars[i].color, activeCars[i].speed, activeCars[i].power, activeCars[i].special, ctx, 5, i * 40, activeCars[i].name);
           currentCars.push(newCar);
         }
@@ -431,6 +432,10 @@ var myCurrentCars = {};
 
 var allCars = {
     _saveCar: function _saveCar(val) {
+        // check to make sure have all params before saving
+        if (!val.name || !val.power || !val.speed || !val.special) {
+            return;
+        }
         // gat all cars already there, and add a new car to the list
         var storedCars = this._load();
         // val is stringified JSON the user endered into the form
