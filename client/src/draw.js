@@ -56,6 +56,10 @@ class car{
       if (this.xPosition <= width - 45){
         this.xPosition += (this.special * (Math.random() + 1) + this.speed * 2 + this.power)/ 10;
       }
+      else if (!winning){
+        this.winning = true;
+        winning = true;
+      }
     }
   }
   
@@ -72,12 +76,12 @@ class car{
     }
     ctx.restore();
   // daw all the cars
-  if (currentCars != [] && !winning){
+  if (currentCars != []){
     for (let carToDraw of currentCars){
       carToDraw.drawMyCar();
       carToDraw.move();
-      if (carToDraw.xPosition === (width - 45)){
-        winning = true;
+      if (carToDraw.winning){
+        document.querySelector("#content").innerHTML = `<b>${(carToDraw.name)} WINS</b>`;
       }
     }
 

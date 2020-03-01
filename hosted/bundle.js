@@ -76,6 +76,9 @@ var car = function () {
     value: function move() {
       if (this.xPosition <= width - 45) {
         this.xPosition += (this.special * (Math.random() + 1) + this.speed * 2 + this.power) / 10;
+      } else if (!winning) {
+        this.winning = true;
+        winning = true;
       }
     }
   }]);
@@ -96,7 +99,7 @@ function loop() {
   }
   ctx.restore();
   // daw all the cars
-  if (currentCars != [] && !winning) {
+  if (currentCars != []) {
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
     var _iteratorError = undefined;
@@ -107,8 +110,8 @@ function loop() {
 
         carToDraw.drawMyCar();
         carToDraw.move();
-        if (carToDraw.xPosition === width - 45) {
-          winning = true;
+        if (carToDraw.winning) {
+          document.querySelector("#content").innerHTML = '<b>' + carToDraw.name + ' WINS</b>';
         }
       }
     } catch (err) {
@@ -269,7 +272,6 @@ var currentCars = [];
 var winning = false;
 
 var init = function init() {
-
   var app = new Vue({
     el: "#app",
     data: {
@@ -291,12 +293,18 @@ var init = function init() {
           return;
         }
         // update list of cars that will be racing from list of all cars
-        var currentCar = myCar.options[myCar.selectedIndex].value;
-        var carToAdd = listOfCars[currentCar];
-        activeCars.push(carToAdd);
-        myCar.remove(myCar.selectedIndex);
-        this.racing = false; // can now click racing button
-        this.carsInRace.push(carToAdd);
+        // check to make sure not over 10 cars in race
+        if (activeCars.length < 10) {
+          var currentCar = myCar.options[myCar.selectedIndex].value;
+          var carToAdd = listOfCars[currentCar];
+          activeCars.push(carToAdd);
+          myCar.remove(myCar.selectedIndex);
+          this.racing = false; // can now click racing button
+          this.carsInRace.push(carToAdd);
+        } else {
+          document.querySelector("#content").innerHTML = "<b>10 is the limit of cars in the race. Reset to add change cars</b>";
+          return;
+        }
       },
       retrieveCars: function retrieveCars(url) {
         var xhr = new XMLHttpRequest();

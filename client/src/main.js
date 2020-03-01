@@ -6,7 +6,6 @@ let currentCars = [];
 let winning = false;
 
 const init = () =>{
-
   let app = new Vue({
     el: "#app",
     data:{
@@ -28,12 +27,19 @@ const init = () =>{
           return;
         }
         // update list of cars that will be racing from list of all cars
-        let currentCar = myCar.options[myCar.selectedIndex].value;
-        let carToAdd = listOfCars[currentCar];
-        activeCars.push(carToAdd);
-        myCar.remove(myCar.selectedIndex);
-        this.racing = false; // can now click racing button
-        this.carsInRace.push(carToAdd);
+          // check to make sure not over 10 cars in race
+        if(activeCars.length < 10){
+          let currentCar = myCar.options[myCar.selectedIndex].value;
+          let carToAdd = listOfCars[currentCar];
+          activeCars.push(carToAdd);
+          myCar.remove(myCar.selectedIndex);
+          this.racing = false; // can now click racing button
+          this.carsInRace.push(carToAdd);
+        }
+        else{
+          document.querySelector("#content").innerHTML = "<b>10 is the limit of cars in the race. Reset to add change cars</b>";
+          return;
+        }
       },
       retrieveCars(url){
         const xhr = new XMLHttpRequest();
